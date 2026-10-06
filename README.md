@@ -4,13 +4,24 @@ Georgia State University Mobile Application Development.
 
 Repository: [mmohamed05/inclass_act07](https://github.com/mmohamed05/inclass_act07)
 
-## Current status
+## Final integration status
 
-- Team 1 Care Systems is complete on `team-1/care-systems`.
-- Team 2 UI/personality from PR #2 is integrated for testing on `integration/digital-pet`.
-- Session Controls adds Pause/Resume with real timer cancellation and restart.
-- Neither original PR has been merged into `main`.
-- The final merged APK has not been built yet.
+Undergraduate pathway: the final app combines both team workstreams on `main`.
+Human teammate `Prophet-20` approved integration commit `da716c6` on GitHub;
+[PR #3](https://github.com/mmohamed05/inclass_act07/pull/3) was merged with a normal
+merge commit (`c0ed3b9`), preserving the team history.
+
+Advanced features:
+
+1. **Visual Polish & Accessible Motion** — Team 2's personality and visual bundle.
+2. **Session Controls** — Pause/Resume with real timer cancellation and restart.
+
+## Collaboration links
+
+- [Team 1 Care Systems — PR #1](https://github.com/mmohamed05/inclass_act07/pull/1)
+- [Team 2 Pet Personality — PR #2](https://github.com/mmohamed05/inclass_act07/pull/2)
+- [Final integration — PR #3](https://github.com/mmohamed05/inclass_act07/pull/3)
+- [Repository issue tracker](https://github.com/mmohamed05/inclass_act07/issues)
 
 ## Team 1 — Care Systems
 
@@ -48,7 +59,7 @@ confirmed pet name, action/session revisions, and Pause/Resume controls.
 
 ## Team 2 — UI/personality (teammate-owned)
 
-The integration branch includes the artwork, editable name, mood presentation,
+Team 2 contributor: **Prophet-20**. The final app includes the artwork, editable name, mood presentation,
 speech, animated meters, reactions, and reduced-motion support from PR #2.
 The original PR branch remains unchanged.
 
@@ -68,13 +79,18 @@ flutter analyze
 flutter test
 ```
 
-See [integration verification](docs/INTEGRATION_VERIFICATION.md) for emulator
-observations, limits, and merge considerations.
+See [final verification](docs/FINAL_VERIFICATION.md) for merged-main and release
+verification. [Integration verification](docs/INTEGRATION_VERIFICATION.md) records
+the earlier pre-merge checks.
 
-Current integration evidence:
+Final automated results from merged `main`:
 
 - `flutter analyze`: no issues.
 - `flutter test`: 22 tests passed (care, personality, and session controls).
+- Pixel 7 merged-main run: care, name, pause/resume, reduced motion, and real-time
+  win/loss verified; no obvious overflow, Dart exceptions, or crashes.
+- Release APK: built successfully, installed on Pixel 7, and launch/core controls
+  verified. See the final verification report for logs and scope.
 
 The widget tests cover initial state, care actions, meter boundaries, timer
 behavior, outcomes, reset, and disposal. Tests advance simulated time; production
@@ -83,11 +99,22 @@ The original Team 1 suite remains covered with updated UI assertions. New tests
 verify paused controls and meters, interrupted win timing, fresh intervals on
 resume, reset clearing pause, and no duplicate hunger timers.
 
-## Remaining integration work
+## Release build and deliverables
 
-Review the integration changes and emulator evidence before approving merges.
-After the agreed merge, rerun checks on the final branch, then build and validate
-the final APK before submission. No release APK or submission has been produced.
+```sh
+flutter build apk --release
+mkdir -p submission
+cp build/app/outputs/flutter-apk/app-release.apk submission/DigitalPet_Team1Team2.apk
+```
+
+The original generated APK remains at
+`build/app/outputs/flutter-apk/app-release.apk`. The submission copy is
+`submission/DigitalPet_Team1Team2.apk`; APKs are separate deliverables and are not
+committed. `submission/github_link.txt` contains the repository URL.
+
+Submit the APK, repository link, and your separately prepared personal reflection
+through the course's required submission process. The personal reflection is not
+generated or overwritten by this project. Nothing has been submitted to iCollege.
 
 ## Session Controls — second undergraduate advanced feature
 
@@ -111,12 +138,13 @@ See [the integration guide](docs/PET_PERSONALITY.md) for state inputs, action
 notifications, customization, and learning outcomes. Asset provenance is in
 [assets/ATTRIBUTION.txt](assets/ATTRIBUTION.txt). Team 1 still owns care rules,
 timers, outcomes, and integration into the main screen. Session Controls now
-provides the second feature on the temporary integration branch.
+provides the second feature in the merged main app.
 
-[Component test results](docs/PET_PERSONALITY_TEST_RESULTS.md): analysis passed and all 13 tests passed.
+Historical [Team 2 component results](docs/PET_PERSONALITY_TEST_RESULTS.md):
+13 tests passed before integration. The final combined suite has 22 tests.
 
 `PetCareView` now supplies a reusable screen body with care-action callbacks and
 pet-name confirmation. It is adapted to the Team 1 PR #1 state interface. The
 care implementation and combined main.dart are outside the original Team 2 PR;
-they are connected on this integration branch.
+they are connected in the merged main app.
 See the integration guide for the exact connection snippet.

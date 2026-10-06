@@ -46,3 +46,6 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# APKs are separate course deliverables, not repository source.
+/submission/*.apk

@@ -1,5 +1,8 @@
 # Digital Pet integration verification
 
+Historical pre-merge record. PR #3 is now merged; see
+[final verification](FINAL_VERIFICATION.md) for current main and release evidence.
+
 Branch: `integration/digital-pet` (temporary; neither PR merged into `main`).
 
 Sources: Team 1 `7c25e45` and Team 2 PR #2 head
