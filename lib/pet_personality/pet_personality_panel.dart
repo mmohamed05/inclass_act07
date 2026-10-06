@@ -1,5 +1,7 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+
 import 'pet_presentation.dart';
 
 /// Appearance and timing knobs. Game thresholds live in PersonalityRules.
@@ -25,15 +27,15 @@ class PetAppearance {
   final Duration bounceHold, reactionHold;
 
   Color colorFor(PetMood mood) => switch (mood) {
-        PetMood.happy => happyColor,
-        PetMood.neutral => neutralColor,
-        PetMood.unhappy => unhappyColor,
-      };
+    PetMood.happy => happyColor,
+    PetMood.neutral => neutralColor,
+    PetMood.unhappy => unhappyColor,
+  };
   double scaleFor(PetMood mood) => switch (mood) {
-        PetMood.happy => happyScale,
-        PetMood.neutral => neutralScale,
-        PetMood.unhappy => unhappyScale,
-      };
+    PetMood.happy => happyScale,
+    PetMood.neutral => neutralScale,
+    PetMood.unhappy => unhappyScale,
+  };
 }
 
 /// Drop this widget into the partner's screen. It NEVER changes game values.
@@ -135,15 +137,23 @@ class _PetPersonalityPanelState extends State<PetPersonalityPanel> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(name,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineSmall),
+            Text(
+              name,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
             const SizedBox(height: 8),
-            Wrap(alignment: WrapAlignment.center, spacing: 8, children: [
-              Icon(moodIcon),
-              Text('Mood: $moodLabel',
-                  style: Theme.of(context).textTheme.titleMedium),
-            ]),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 8,
+              children: [
+                Icon(moodIcon),
+                Text(
+                  'Mood: $moodLabel',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ],
+            ),
             SizedBox(
               height: 220,
               child: Center(
@@ -164,9 +174,10 @@ class _PetPersonalityPanelState extends State<PetPersonalityPanel> {
                         width: 180,
                         excludeFromSemantics: true,
                         errorBuilder: (context, error, stack) => const Icon(
-                            Icons.pets,
-                            size: 120,
-                            color: Colors.white),
+                          Icons.pets,
+                          size: 120,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
@@ -189,9 +200,11 @@ class _PetPersonalityPanelState extends State<PetPersonalityPanel> {
                       ? Text(message, textAlign: TextAlign.center)
                       : AnimatedSwitcher(
                           duration: appearance.messageDuration,
-                          child: Text(message,
-                              key: ValueKey(message),
-                              textAlign: TextAlign.center),
+                          child: Text(
+                            message,
+                            key: ValueKey(message),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                 ),
               ),
@@ -205,35 +218,41 @@ class _PetPersonalityPanelState extends State<PetPersonalityPanel> {
               child: AnimatedOpacity(
                 opacity: _reaction == null ? 0 : 1,
                 duration: motion,
-                child: Text(_reactionLabel(_reaction),
-                    key: const ValueKey('reaction'),
-                    textAlign: TextAlign.center),
+                child: Text(
+                  _reactionLabel(_reaction),
+                  key: const ValueKey('reaction'),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
             const SizedBox(height: 12),
             _Meter(
-                label: 'Happiness',
-                value: pet.happiness,
-                duration: appearance.meterDuration,
-                reduceMotion: reduceMotion),
+              label: 'Happiness',
+              value: pet.happiness,
+              duration: appearance.meterDuration,
+              reduceMotion: reduceMotion,
+            ),
             _Meter(
-                label: 'Hunger',
-                value: pet.hunger,
-                duration: appearance.meterDuration,
-                reduceMotion: reduceMotion),
+              label: 'Hunger',
+              value: pet.hunger,
+              duration: appearance.meterDuration,
+              reduceMotion: reduceMotion,
+            ),
             if (pet.energy != null)
               _Meter(
-                  label: 'Energy',
-                  value: pet.energy!,
-                  duration: appearance.meterDuration,
-                  reduceMotion: reduceMotion),
+                label: 'Energy',
+                value: pet.energy!,
+                duration: appearance.meterDuration,
+                reduceMotion: reduceMotion,
+              ),
             if (pet.outcome != PetOutcome.playing) ...[
               const SizedBox(height: 12),
               Text(
-                  pet.outcome == PetOutcome.won
-                      ? 'You won! Restart to play again.'
-                      : 'Game over. Restart to try again.',
-                  textAlign: TextAlign.center),
+                pet.outcome == PetOutcome.won
+                    ? 'You won! Restart to play again.'
+                    : 'Game over. Restart to try again.',
+                textAlign: TextAlign.center,
+              ),
             ],
           ],
         ),
@@ -243,19 +262,20 @@ class _PetPersonalityPanelState extends State<PetPersonalityPanel> {
 }
 
 String _reactionLabel(PetAction? action) => switch (action) {
-      PetAction.feed => 'Snack time!',
-      PetAction.play => 'That was fun!',
-      PetAction.rest => 'Rest time...',
-      PetAction.pet => 'Thanks for the love!',
-      null => ' ',
-    };
+  PetAction.feed => 'Snack time!',
+  PetAction.play => 'That was fun!',
+  PetAction.rest => 'Rest time...',
+  PetAction.pet => 'Thanks for the love!',
+  null => ' ',
+};
 
 class _Meter extends StatelessWidget {
-  const _Meter(
-      {required this.label,
-      required this.value,
-      required this.duration,
-      required this.reduceMotion});
+  const _Meter({
+    required this.label,
+    required this.value,
+    required this.duration,
+    required this.reduceMotion,
+  });
   final String label;
   final int value;
   final Duration duration;
@@ -267,32 +287,33 @@ class _Meter extends StatelessWidget {
     final bounded = value.clamp(0, 100).toInt();
     final target = bounded / 100.0;
     Widget bar(double amount) => LinearProgressIndicator(
-          value: amount,
-          minHeight: 8,
-          color: Theme.of(context).colorScheme.primary,
-          backgroundColor:
-              Theme.of(context).colorScheme.surfaceContainerHighest,
-        );
+      value: amount,
+      minHeight: 8,
+      color: Theme.of(context).colorScheme.primary,
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+    );
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Semantics(
         label: label,
         value: '$bounded out of 100',
         excludeSemantics: true,
-        child:
-            Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Text('$label: $bounded / 100'),
-          const SizedBox(height: 6),
-          if (reduceMotion)
-            bar(target)
-          else
-            TweenAnimationBuilder<double>(
-              tween: Tween<double>(begin: target, end: target),
-              duration: duration,
-              curve: Curves.easeOut,
-              builder: (context, amount, child) => bar(amount),
-            ),
-        ]),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text('$label: $bounded / 100'),
+            const SizedBox(height: 6),
+            if (reduceMotion)
+              bar(target)
+            else
+              TweenAnimationBuilder<double>(
+                tween: Tween<double>(begin: target, end: target),
+                duration: duration,
+                curve: Curves.easeOut,
+                builder: (context, amount, child) => bar(amount),
+              ),
+          ],
+        ),
       ),
     );
   }

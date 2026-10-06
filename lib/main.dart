@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'pet_personality/pet_personality.dart';
+
 void main() {
   runApp(const DigitalPetApp());
 }
@@ -34,6 +36,12 @@ class _DigitalPetPageState extends State<DigitalPetPage> {
   int _happiness = 50;
   int _hunger = 50;
 
+  String _petName = 'Pip';
+  PetAction? _personalityLastAction;
+  int _personalityActionRevision = 0;
+  int _personalitySessionRevision = 0;
+  bool _isPaused = false;
+
   bool _gameOver = false;
   bool _hasWon = false;
 
@@ -44,14 +52,8 @@ class _DigitalPetPageState extends State<DigitalPetPage> {
     return value.clamp(0, 100).toInt();
   }
 
-  String get _outcomeText {
-    if (_hasWon) return 'You win!';
-    if (_gameOver) return 'Game over';
-    return 'Take care of your pet';
-  }
-
   void _feedPet() {
-    if (_gameOver || _hasWon) return;
+    if (_gameOver || _hasWon || _isPaused) return;
 
     final nextHunger = _clampMeter(_hunger - 10);
     final happinessChange = nextHunger < 30 ? -20 : 10;
@@ -60,24 +62,28 @@ class _DigitalPetPageState extends State<DigitalPetPage> {
     setState(() {
       _hunger = nextHunger;
       _happiness = nextHappiness;
+      _personalityLastAction = PetAction.feed;
+      _personalityActionRevision++;
     });
 
     _updateOutcome();
   }
 
   void _playPet() {
-    if (_gameOver || _hasWon) return;
+    if (_gameOver || _hasWon || _isPaused) return;
 
     setState(() {
       _happiness = _clampMeter(_happiness + 15);
       _hunger = _clampMeter(_hunger + 5);
+      _personalityLastAction = PetAction.play;
+      _personalityActionRevision++;
     });
 
     _updateOutcome();
   }
 
   void _updateOutcome() {
-    if (_gameOver || _hasWon) return;
+    if (_gameOver || _hasWon || _isPaused) return;
 
     if (_hunger == 100 && _happiness <= 10) {
       _highMoodTimer?.cancel();
@@ -100,7 +106,7 @@ class _DigitalPetPageState extends State<DigitalPetPage> {
     _highMoodTimer ??= Timer(const Duration(minutes: 3), () {
       _highMoodTimer = null;
 
-      if (!mounted || _gameOver || _happiness <= 80) {
+      if (!mounted || _gameOver || _hasWon || _isPaused || _happiness <= 80) {
         return;
       }
 
@@ -114,9 +120,11 @@ class _DigitalPetPageState extends State<DigitalPetPage> {
 
   void _startHungerTimer() {
     _hungerTimer?.cancel();
+    _hungerTimer = null;
+    if (_isPaused || _gameOver || _hasWon) return;
 
     _hungerTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
-      if (!mounted || _gameOver || _hasWon) {
+      if (!mounted || _gameOver || _hasWon || _isPaused) {
         timer.cancel();
         return;
       }
@@ -134,6 +142,26 @@ class _DigitalPetPageState extends State<DigitalPetPage> {
     });
   }
 
+  void _togglePause() {
+    if (_gameOver || _hasWon) return;
+
+    _hungerTimer?.cancel();
+    _hungerTimer = null;
+    _highMoodTimer?.cancel();
+    _highMoodTimer = null;
+
+    setState(() {
+      _isPaused = !_isPaused;
+      if (_isPaused) _personalitySessionRevision++;
+    });
+
+    if (!_isPaused) {
+      _startHungerTimer();
+      // Pausing interrupts continuous high mood; resume starts a full interval.
+      _updateOutcome();
+    }
+  }
+
   void _resetPet() {
     _highMoodTimer?.cancel();
     _highMoodTimer = null;
@@ -143,6 +171,9 @@ class _DigitalPetPageState extends State<DigitalPetPage> {
       _hunger = 50;
       _gameOver = false;
       _hasWon = false;
+      _isPaused = false;
+      _personalityLastAction = null;
+      _personalitySessionRevision++;
     });
 
     _startHungerTimer();
@@ -163,49 +194,28 @@ class _DigitalPetPageState extends State<DigitalPetPage> {
 
   @override
   Widget build(BuildContext context) {
-    final actionsDisabled = _gameOver || _hasWon;
-
     return Scaffold(
       appBar: AppBar(title: const Text('Digital Pet')),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.pets, size: 100),
-            const SizedBox(height: 24),
-            Text(
-              _outcomeText,
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 32),
-            Text('Happiness: $_happiness'),
-            LinearProgressIndicator(value: _happiness / 100),
-            const SizedBox(height: 24),
-            Text('Hunger: $_hunger'),
-            LinearProgressIndicator(value: _hunger / 100),
-            const SizedBox(height: 32),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              alignment: WrapAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: actionsDisabled ? null : _feedPet,
-                  child: const Text('Feed'),
-                ),
-                ElevatedButton(
-                  onPressed: actionsDisabled ? null : _playPet,
-                  child: const Text('Play'),
-                ),
-                ElevatedButton(
-                  onPressed: _resetPet,
-                  child: const Text('Reset'),
-                ),
-              ],
-            ),
-          ],
+      body: PetCareView(
+        pet: PetSnapshot(
+          name: _petName,
+          happiness: _happiness,
+          hunger: _hunger,
+          outcome: _gameOver
+              ? PetOutcome.lost
+              : _hasWon
+              ? PetOutcome.won
+              : PetOutcome.playing,
         ),
+        onFeed: _feedPet,
+        onPlay: _playPet,
+        onReset: _resetPet,
+        onNameConfirmed: (name) => setState(() => _petName = name),
+        lastAction: _personalityLastAction,
+        actionRevision: _personalityActionRevision,
+        sessionRevision: _personalitySessionRevision,
+        paused: _isPaused,
+        onTogglePause: _togglePause,
       ),
     );
   }

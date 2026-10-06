@@ -7,7 +7,9 @@ Repository: [mmohamed05/inclass_act07](https://github.com/mmohamed05/inclass_act
 ## Current status
 
 - Team 1 Care Systems is complete on `team-1/care-systems`.
-- Team 2 UI/personality work is teammate-owned and pending.
+- Team 2 UI/personality from PR #2 is integrated for testing on `integration/digital-pet`.
+- Session Controls adds Pause/Resume with real timer cancellation and restart.
+- Neither original PR has been merged into `main`.
 - The final merged APK has not been built yet.
 
 ## Team 1 — Care Systems
@@ -28,8 +30,8 @@ Responsibilities:
 
 The implementation is in `lib/main.dart`, with widget tests in
 `test/widget_test.dart`. Happiness and hunger both start at 50 and stay within
-0–100. The current UI is a temporary pet icon, numeric meters with progress bars,
-care buttons, and outcome text.
+0–100. The combined screen uses Team 2’s `PetCareView` with Team 1’s real state,
+confirmed pet name, action/session revisions, and Pause/Resume controls.
 
 ### Feature evidence
 
@@ -44,10 +46,11 @@ care buttons, and outcome text.
 | Reset | Restores both meters to 50, clears outcomes, cancels the win timer, and replaces the hunger timer. | Reset after win/loss and repeated resets without duplicate hunger ticks verified. |
 | Lifecycle Cleanup | Timers start outside `build()` and are canceled in `dispose()`; callbacks guard against an unmounted widget. | Unmounting with both timers active and advancing past their deadlines produces no exception or pending-timer failure. |
 
-## Team 2 — UI/personality (teammate-owned / pending)
+## Team 2 — UI/personality (teammate-owned)
 
-Pet personality and final visuals remain with Team 2. No completed Team 2 work,
-teammate review, or merged-app results are claimed here.
+The integration branch includes the artwork, editable name, mood presentation,
+speech, animated meters, reactions, and reduced-motion support from PR #2.
+The original PR branch remains unchanged.
 
 ## Setup
 
@@ -65,21 +68,35 @@ flutter analyze
 flutter test
 ```
 
-Current Team 1 evidence:
+See [integration verification](docs/INTEGRATION_VERIFICATION.md) for emulator
+observations, limits, and merge considerations.
+
+Current integration evidence:
 
 - `flutter analyze`: no issues.
-- `flutter test`: 7 tests passed.
+- `flutter test`: 22 tests passed (care, personality, and session controls).
 
 The widget tests cover initial state, care actions, meter boundaries, timer
 behavior, outcomes, reset, and disposal. Tests advance simulated time; production
 intervals remain 30 seconds for hunger and 3 minutes for the win condition.
-These results apply to the Team 1 implementation before Team 2 integration.
+The original Team 1 suite remains covered with updated UI assertions. New tests
+verify paused controls and meters, interrupted win timing, fresh intervals on
+resume, reset clearing pause, and no duplicate hunger timers.
 
 ## Remaining integration work
 
-After Team 2 finishes, review and integrate the UI/personality work with the care
-systems, rerun analysis and tests, and verify the combined app on a device or
-emulator. Build and validate the final merged APK afterward, before submission.
+Review the integration changes and emulator evidence before approving merges.
+After the agreed merge, rerun checks on the final branch, then build and validate
+the final APK before submission. No release APK or submission has been produced.
+
+## Session Controls — second undergraduate advanced feature
+
+Pause disables Feed/Play, cancels hunger and win timers, and clears visual action
+feedback. Resume starts a fresh 30-second hunger interval; happiness above 80
+starts a fresh continuous 3-minute win interval. Paused time never counts toward
+a win. Reset clears pause/outcomes and replaces timers safely while retaining the
+confirmed pet name. Session Controls is separate from Team 2's visual-polish
+bundle and implements the requested second advanced feature.
 
 ## Team 2 pet personality
 
@@ -93,12 +110,13 @@ Run checks with `flutter analyze` and `flutter test`.
 See [the integration guide](docs/PET_PERSONALITY.md) for state inputs, action
 notifications, customization, and learning outcomes. Asset provenance is in
 [assets/ATTRIBUTION.txt](assets/ATTRIBUTION.txt). Team 1 still owns care rules,
-timers, outcomes, and integration into the main screen. The combined
-undergraduate app needs one additional advanced feature beyond this bundle.
+timers, outcomes, and integration into the main screen. Session Controls now
+provides the second feature on the temporary integration branch.
 
 [Component test results](docs/PET_PERSONALITY_TEST_RESULTS.md): analysis passed and all 13 tests passed.
 
 `PetCareView` now supplies a reusable screen body with care-action callbacks and
 pet-name confirmation. It is adapted to the Team 1 PR #1 state interface. The
-care implementation and combined main.dart are deliberately outside this PR.
+care implementation and combined main.dart are outside the original Team 2 PR;
+they are connected on this integration branch.
 See the integration guide for the exact connection snippet.
