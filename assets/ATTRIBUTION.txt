@@ -1,0 +1,4 @@
+pet.svg and pet.png: original geometric pet illustration created for this project
+with OpenAI Codex. No third-party artwork was copied. You may use, modify, and
+redistribute these supplied assets with your project. pet.svg is the editable
+source; pet.png is the transparent grayscale runtime asset used by Flutter.
